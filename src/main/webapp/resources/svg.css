@@ -1,0 +1,51 @@
+
+svg {
+    border: 1px solid black;
+        max-width: 100%; /* Максимальная ширина 100% от родителя */
+        height: auto; /* Автоматическая высота для сохранения пропорций */
+
+}
+svg .tick {
+    fill: black;
+}
+svg .point-away {
+    fill: blue;
+}
+svg .point-got {
+    fill: red;
+}
+svg .grid{
+    stroke: gray;
+    stroke-width: 0.5;
+}
+/* Стили для всех элементов с классом 'label' внутри svg */
+svg .label {
+    font-size: 6px;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    font-weight: normal;
+}
+svg .figure{
+    fill:lightgray;
+    stroke:gray; /* Цвет границы полукруга*/
+    stroke-width: 1;
+}
+.button {
+    background-color: #4CAF50; /* Зеленый фон */
+    border: none; /* Убираем границу */
+    color: white; /* Цвет текста */
+    padding: 15px 32px; /* Отступы */
+    text-align: center; /* Выравнивание текста */
+    text-decoration: none; /* Убираем подчеркивание */
+    display: inline-block; /* Делаем блочный элемент для удобства */
+    font-size: 16px; /* Размер шрифта */
+    margin: 4px 2px; /* Отступы */
+    cursor: pointer; /* Курсор при наведении */
+    border-radius: 8px; /* Закругленные углы */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Плавный переход */
+}
+
+.button:hover {
+    background-color: #45a049; /* Цвет при наведении */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Тень при наведении */
+}
