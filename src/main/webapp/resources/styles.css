@@ -1,0 +1,96 @@
+@import url("/resources/svg.css");
+table{
+    text-align: center;
+    width: 100%;
+    table-layout: fixed;
+}
+
+th{
+    font-family: Arial, sans-serif; /* Устанавливаем Arial как основной шрифт, с запасным sans-serif */
+    font-weight: normal;
+    color: #000000; /* Красный цвет заголовка */
+    font-size: 12px; /* Размер шрифта заголовка 2em */
+}
+:first-of-type tr{
+    font-weight: bold;
+}
+label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-size: 14px;
+    font-weight: bold;
+}
+/* Общие стили для заголовков и ячеек */
+th, td {
+    border: 1px solid #ccc; /* Добавляем границы к ячейкам */
+    padding: 10px; /* Добавляем отступы внутри ячеек */
+}
+
+
+/* Адаптивные стили */
+@media (max-width: 600px) {
+    th, td {
+        width: 100%; /* Ячейки на всю ширину на маленьких экранах */
+        display: block; /* Ячейки ведут себя как блоки */
+    }
+    tr {
+        display: flex; /* Убираем традиционное поведение строки */
+        flex-direction: column; /* Расположение ячеек вертикально */
+        margin-bottom: 10px; /* Отступ между строками */
+    }
+}
+
+/* Стили для всех меток (label) в HTML */
+
+
+/* Стили для всех текстовых полей (input type="text") */
+#myForm .input {
+    width: 100px;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 10px;
+}
+
+.button{
+    margin: 5px;
+}
+#myForm .input:focus{
+    border-color: #007bff;
+    outline: none;
+
+}
+
+#myForm {
+    margin: 10px; /* Добавляет отступы сверху и снизу формы */
+    /*padding: 1px; !* Добавляет внутренние отступы вокруг содержимого формы *!*/
+}
+/*#myForm > div {*/
+/*    margin: 10px;*/
+/*}*/
+
+
+
+fieldset {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1px;
+    margin: 1px 0;
+    background: #f9f9f9;
+}
+legend {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+#dataTable tbody tr:first-child {
+    font-weight: bold;
+}
+#dataTable tbody tr{
+    font-weight: normal;
+}
+#dataTable tbody td::selection,
+#dataTable thead th::selection{
+    background-color: yellow; /* Цвет фона выделенного текста */
+    color: black; /* Цвет текста выделенного текста */
+}

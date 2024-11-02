@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>web</title>
+    <h:outputStylesheet  name="styles.css"/> <!-- Подключение внешнего CSS файла -->
+<!--    <script type="text/javascript">-->
+<!--        // Определение функции до её использования-->
+<!--        function updatePlot() {-->
+<!--            let slider = document.getElementById("myForm:r").value-->
+<!--            console.log('Значение слайдера:', slider);-->
+<!--            // Здесь добавьте ваш код для обновления графика-->
+<!--        }-->
+<!--    </script>-->
+
+<!--        <h:outputScript library="plot" name="plot.js" target="body"  />-->
+<!--    <script type="text/javascript" src="./resources/plot/plot.js"> </script>-->
+
+
+</h:head>
+<h:body>
+    <table>
+        <tr>
+            <th>ФИО</th>
+            <th>Номер группы</th>
+            <th>Номер варианта</th>
+        </tr>
+        <tr>
+            <th>Прадед Владимир Владимирович</th>
+            <th>P3206</th>
+            <th>115225</th>
+        </tr>
+        <tbody>
+        <tr>
+            <td>
+                <svg id="mySvg" width="400" height="400" viewBox="0 0 200 200" class="svg">
+                    <g class="grid">
+                        <line x1="100" y1="0" x2="100" y2="200"/>
+                        <line x1="0" y1="100" x2="200" y2="100"/>
+                    </g>
+                </svg>
+            </td>
+            <td>
+                <h:form id="myForm">
+                    <div >
+                    <h:outputLabel for="x" value="X: " />
+                    <h:inputText id="x"  styleClass="input"  value="#{xBean.x}" />
+                    </div>
+                    <div>
+                        <h:outputLabel  value="Y: " />
+                        <h:selectOneMenu  styleClass="input"  value="#{yBean.y}">
+                        <f:selectItem itemLabel="-2" itemValue="-2" />
+                        <f:selectItem itemLabel="-1.5" itemValue="-1.5" />
+                        <f:selectItem itemLabel="-1" itemValue="-1" />
+                        <f:selectItem itemLabel="-0.5" itemValue="-0.5" />
+                        <f:selectItem itemLabel="0" itemValue="0" />
+                        <f:selectItem itemLabel="0.5" itemValue="0.5" />
+                        <f:selectItem itemLabel="1" itemValue="1" />
+                    </h:selectOneMenu>
+                    </div>
+                    <div>
+                    <p:outputLabel for="r" value="R: " />
+                    <p:inputText id="r" styleClass="input" value="#{rBean.r}" readonly="true" />
+
+                    <p:slider id="rSlider" for="r" minValue="1" maxValue="4" step="0.25"  onSlideEnd="updatePlot()"        />
+                    </div>
+                    <h:commandButton styleClass="button"
+                                     ajax="true"
+                                     value="Submit"
+                                     action="#{formSubmitBean.submit}"
+                    >
+                        <f:ajax execute="@form" render=""/>
+                    </h:commandButton>
+                </h:form>
+                <p:commandButton
+                        value="Reset data"
+                        action="#{resetBean.reset}"
+                        icon="pi pi-refresh"
+                        ajax="true"
+                        styleClass="ui-button-danger"/>
+
+
+                <h:outputText id="error-message" value="#{errorBean.errors}" style="color: red;" />
+                <h:panelGroup id="result" layout="block"/>
+            </td>
+            <td>
+                    <p:dataTable id="dataTable" value="#{tableBean.records}" var="point">
+                        <p:column headerText="x">
+                            #{point.x}
+                        </p:column>
+                        <p:column headerText="y">
+                            #{point.y}
+                        </p:column>
+                        <p:column headerText="R">
+                            #{point.r}
+                        </p:column>
+                        <p:column headerText="result">
+                            #{point.gotIt}
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:commandButton value="" id="tableUpdater" update="dataTable" actionListener="#{tableBean.updateTable}" style="visibility: hidden" />
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+        <p:remoteCommand name="pointSaveCommand"
+                         action="#{pointSaverBean.savePointFromJS}"
+                          />
+<!--        <script>-->
+<!--            window.callSavePoint = function(x, y, r) {-->
+<!--                console.log('callSavePoint called with:', x, y, r);-->
+<!--                if (PF('pointSaveCommand')) {-->
+<!--                    PF('pointSaveCommand').call({ x: x, y: y, r: r });-->
+<!--                } else {-->
+<!--                    console.error("pointSaveCommand is undefined.");-->
+<!--                }-->
+<!--            };-->
+<!--        </script>-->
+        <!-- Your other input fields and buttons here -->
+
+    <script type="module" src="./resources/home.js"> </script>
+
+<!--    <h:outputScript  name="home.js" target="body" type="module" />-->
+
+</h:body>
+</html>
