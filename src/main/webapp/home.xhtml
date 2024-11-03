@@ -10,17 +10,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>web</title>
     <h:outputStylesheet  name="styles.css"/> <!-- Подключение внешнего CSS файла -->
-<!--    <script type="text/javascript">-->
-<!--        // Определение функции до её использования-->
-<!--        function updatePlot() {-->
-<!--            let slider = document.getElementById("myForm:r").value-->
-<!--            console.log('Значение слайдера:', slider);-->
-<!--            // Здесь добавьте ваш код для обновления графика-->
-<!--        }-->
-<!--    </script>-->
-
-<!--        <h:outputScript library="plot" name="plot.js" target="body"  />-->
-<!--    <script type="text/javascript" src="./resources/plot/plot.js"> </script>-->
 
 
 </h:head>
@@ -108,6 +97,10 @@
                     <p:commandButton value="" id="tableUpdater" update="dataTable" actionListener="#{tableBean.updateTable}" style="visibility: hidden" />
             </td>
         </tr>
+        <tr>
+            <td>                <button id="back" class="button" onclick="window.location.replace('http://localhost:8080/index.xhtml')">Назад</button>
+            </td>
+        </tr>
         </tbody>
     </table>
 
@@ -115,21 +108,9 @@
         <p:remoteCommand name="pointSaveCommand"
                          action="#{pointSaverBean.savePointFromJS}"
                           />
-<!--        <script>-->
-<!--            window.callSavePoint = function(x, y, r) {-->
-<!--                console.log('callSavePoint called with:', x, y, r);-->
-<!--                if (PF('pointSaveCommand')) {-->
-<!--                    PF('pointSaveCommand').call({ x: x, y: y, r: r });-->
-<!--                } else {-->
-<!--                    console.error("pointSaveCommand is undefined.");-->
-<!--                }-->
-<!--            };-->
-<!--        </script>-->
-        <!-- Your other input fields and buttons here -->
 
     <script type="module" src="./resources/home.js"> </script>
 
-<!--    <h:outputScript  name="home.js" target="body" type="module" />-->
 
 </h:body>
 </html>
