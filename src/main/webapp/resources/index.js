@@ -9,7 +9,6 @@ function updateClock() {
     document.getElementById('clock').textContent = `${date} ${time}`;
 }
 
-
     // Обновляем часы один раз при загрузке страницы
     updateClock();
 // Запускаем обновление каждые 8 секунд (8000 миллисекунд)
