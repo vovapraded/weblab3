@@ -15,6 +15,11 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
         <junit.version>5.10.2</junit.version>
+        <server.host>se.ifmo.ru</server.host>
+        <server.port>2222</server.port>
+        <server.user>s409397</server.user>
+        <remote.path>/home/studs/s409397</remote.path>
+        <local.file>target/web-lab3-1.0-SNAPSHOT.war</local.file>
     </properties>
 
     <dependencies>
@@ -23,7 +28,6 @@
             <artifactId>jakarta.jakartaee-web-api</artifactId>
             <version>9.1.0</version>
             <scope>provided</scope>
-
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -31,49 +35,34 @@
             <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.icefaces/icefaces -->
-        <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>13.0.10</version>
             <classifier>jakarta</classifier>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>6.4.8.Final</version>
-
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.4</version>
         </dependency>
-
-
-        <!-- https://mvnrepository.com/artifact/org.icefaces/icefaces -->
-
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version> <!-- or any other compatible version -->
+            <version>4.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
-            <version>3.0.0</version> <!-- adjust version as needed -->
+            <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/javax.faces/jsf-api -->
-        <!-- https://mvnrepository.com/artifact/javax.faces/javax.faces-api -->
-
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -86,6 +75,17 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-jsch</artifactId>
+            <version>1.10.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -95,6 +95,83 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>scp-deploy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <taskdef name="scp"
+                                         classname="org.apache.tools.ant.taskdefs.optional.ssh.Scp"
+                                         classpathref="maven.dependency.classpath"/>
+                                <scp file="${local.file}"
+                                     todir="${server.user}@${server.host}:${remote.path}"
+                                     port="${server.port}"
+                                     trust="true"
+                                     password="fJFM(4470"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-checksums-manifest</id>
+                        <phase>none</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+
+                                <checksum fileext=".md5" algorithm="MD5" todir="target/checksums">
+                                    <fileset dir="${project.basedir}">
+                                        <include name="**/*.java"/>
+                                        <exclude name="target/**"/>
+                                        <exclude name=".git/**"/>
+                                    </fileset>
+                                </checksum>
+                                <checksum fileext=".sha1" algorithm="SHA-1" todir="target/checksums">
+                                    <fileset dir="${project.basedir}">
+                                        <include name="**/*.java"/>
+                                        <exclude name="target/**"/>
+                                        <exclude name=".git/**"/>
+                                    </fileset>
+                                </checksum>
+                                <exec executable="sh" dir="${project.basedir}">
+                                    <arg value="checksum.sh"/>
+                                </exec>
+
+
+
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Генерация Javadoc и .jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-doc</id>
+                        <phase>none</phase>
+                        <goals><goal>jar</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>backend.academy</groupId>
+                <artifactId>history</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </plugin>
+
+
+
         </plugins>
     </build>
 </project>
