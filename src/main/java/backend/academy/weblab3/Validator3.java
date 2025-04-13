@@ -1,6 +1,6 @@
 package backend.academy.weblab3;
 
-public class Validator2 {
+public class Validator3 {
     public String validate(String xStr, double y, double r){
         StringBuilder sb = new StringBuilder();
         Double x = null;
