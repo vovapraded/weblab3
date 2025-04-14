@@ -317,3 +317,10 @@ tasks.register("runEnvBuild") {
         }
     }
 }
+tasks.register("history", Exec::class) {
+    group = "git"
+    description = "Rolls back to last working commit and generates a diff of src/"
+
+    workingDir = project.projectDir
+    commandLine("bash", "./rollback-compile.sh")
+}
