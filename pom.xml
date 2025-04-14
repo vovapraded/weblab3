@@ -12,7 +12,8 @@
 
     <properties>
         <junit.version>5.10.2</junit.version>  <!-- Задайте версию JUnit -->
-
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <maven.propertiesFile>maven.properties</maven.propertiesFile>
     </properties>
 

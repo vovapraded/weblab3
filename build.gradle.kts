@@ -1,6 +1,5 @@
-import org.gradle.internal.impldep.org.eclipse.jgit.api.Git
-import org.gradle.internal.impldep.org.eclipse.jgit.lib.Repository
-import org.gradle.internal.impldep.org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import java.util.*
 
 plugins {
@@ -16,6 +15,8 @@ val replacementsFile: File = file(property("alt.replacementsFile")!!)
 val altJarBaseName: String = "${project.name}-${property("alt.jarBaseName")}" // Добавляем project.nameэ
 val altJarDestinationDir: File = file(property("alt.jarDestinationDir")!!)
 val replaceFileExtensions: List<String> = (property("alt.replaceFileExtensions") as String).split(",")
+val envName =property("env.name")!!
+val envFile = file(envName)
 
 repositories {
     mavenCentral()
@@ -23,8 +24,21 @@ repositories {
 tasks.withType<JavaCompile> {
     options.annotationProcessorPath = configurations["annotationProcessor"]
 }
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    }
+}
 dependencies {
-     "annotationProcessor"("org.projectlombok:lombok:1.18.34")
+    "annotationProcessor"("org.projectlombok:lombok:1.18.34")
     "providedCompile"("jakarta.platform:jakarta.jakartaee-web-api:9.1.0")
     "providedCompile"("org.projectlombok:lombok:1.18.34")
     "implementation"("org.primefaces:primefaces:13.0.10:jakarta")
@@ -46,7 +60,6 @@ tasks.war {
 tasks.test {
     useJUnitPlatform()
 }
-
 
 
 val generateChecksums by tasks.creating {
@@ -185,98 +198,122 @@ tasks.register("alt") {
         logger.lifecycle("Alternative JAR created at ${tasks.named<Jar>("altJar").get().archiveFile.get().asFile}")
     }
 }
-// Задача team
-tasks.register<Zip>("team") {
-    description = "Fetches the three previous Git revisions, builds them, and packages the JARs into a ZIP archive"
-    group = "Team"
-    dependsOn("build")
 
-    val tempDir = file("$buildDir/team-revisions")
-    val outputDir = file("$buildDir/team-output")
-    val zipFileName = "team-revisions.zip"
+
+tasks.register("team") {
+    description =
+        "Checks out 3 previous commits using git worktree, builds them, and packages resulting jars into a zip"
+    group = "Team"
 
     doLast {
-        // Инициализация Git-репозитория
-        val repository: Repository = FileRepositoryBuilder()
-            .setGitDir(file("${projectDir}/.git"))
+        val repoDir = project.rootDir
+        val repository = FileRepositoryBuilder()
+            .setGitDir(File(repoDir, ".git"))
+            .readEnvironment()
+            .findGitDir()
             .build()
+
         val git = Git(repository)
 
-        // Получение трех предыдущих коммитов
-        val commits = git.log()
-            .setMaxCount(4) // HEAD + 3 предыдущих
-            .call()
-            .toList()
-            .drop(1) // Пропускаем HEAD
-            .take(3) // Берем 3 предыдущих
-
-        if (commits.size < 3) {
-            throw GradleException("Not enough commits in the repository. Found ${commits.size}, need 3.")
+        val commits = git.log().setMaxCount(4).call().toList()
+        if (commits.size < 4) {
+            throw GradleException("Недостаточно коммитов: нужно минимум 4 (HEAD + 3 предыдущих)")
         }
 
-        // Создание директорий
-        tempDir.mkdirs()
-        outputDir.mkdirs()
+        val previousCommits = commits.drop(1).take(3)
+        val jarsDir = File(buildDir, "teamJars").apply { mkdirs() }
 
-        // Список JAR-файлов для ZIP
-        val jarFiles = mutableListOf<File>()
+        previousCommits.forEach { commit ->
+            val shortHash = commit.name.take(7)
+            val worktreeDir = File(buildDir, "worktree_$shortHash")
+            val internalWorktreeDir = File(repoDir, ".git/worktrees/worktree_$shortHash")
 
-        commits.forEachIndexed { index, commit ->
-            val commitId = commit.name.substring(0, 7) // Короткий хэш
-            val revisionDir = file("$tempDir/revision-$commitId")
-            val revisionBuildDir = file("$revisionDir/build")
-
-            logger.lifecycle("Processing revision ${index + 1}: $commitId")
-
-            // Копирование проекта во временную директорию
-            project.copy {
-                from(projectDir)
-                into(revisionDir)
-                exclude(".git", "build", ".gradle")
+            // Удаляем физическую папку worktree, если осталась
+            if (worktreeDir.exists()) {
+                logger.warn("⚠️ Удаляем физический каталог worktree: $worktreeDir")
+                worktreeDir.deleteRecursively()
             }
 
-            // Чек-аут коммита
-            git.checkout()
-                .setName(commit.name)
-                .call()
-
-            // Выполнение сборки
-            val buildResult = exec {
-                workingDir = revisionDir
-                commandLine = listOf("./gradlew", "build", "-p", revisionDir.absolutePath)
-                isIgnoreExitValue = true
+            // Удаляем .git запись, если осталась
+            if (internalWorktreeDir.exists()) {
+                logger.warn("⚠️ Удаляем .git/worktrees запись: $internalWorktreeDir")
+                internalWorktreeDir.deleteRecursively()
             }
 
-            if (buildResult.exitValue != 0) {
-                throw GradleException("Build failed for revision $commitId")
+            // Очищаем старые записи
+            exec {
+                commandLine("git", "worktree", "prune")
             }
 
-            // Копирование JAR в outputDir
-            val jarFile = file("$revisionBuildDir/libs/${project.name}-${commitId}.jar")
-            val outputJar = file("$outputDir/${project.name}-${commitId}.jar")
-            project.copy {
-                from(fileTree("$revisionBuildDir/libs").matching { include("*.jar") })
-                into(outputDir)
-                rename { "${project.name}-${commitId}.jar" }
+            logger.lifecycle("▶ Добавляем worktree для коммита $shortHash")
+            exec {
+                commandLine("git", "worktree", "add", worktreeDir.absolutePath, commit.name)
             }
 
-            if (outputJar.exists()) {
-                jarFiles.add(outputJar)
-                logger.info("Collected JAR: ${outputJar.name}")
-            } else {
-                throw GradleException("JAR file not found for revision $commitId")
+            // Копируем gradlew, если нужен
+            val gradlew = File(repoDir, "gradlew")
+            if (!File(worktreeDir, "gradlew").exists() && gradlew.exists()) {
+                gradlew.copyTo(File(worktreeDir, "gradlew"), overwrite = true)
+                File(worktreeDir, "gradlew").setExecutable(true)
+                File(repoDir, "gradle").copyRecursively(File(worktreeDir, "gradle"), overwrite = true)
+            }
+
+            logger.lifecycle("⚙️ Сборка коммита $shortHash")
+            val settingsFile = listOf("settings.gradle.kts", "settings.gradle", "build.gradle.kts", "build.gradle")
+                .map { File(worktreeDir, it) }
+                .firstOrNull { it.exists() }
+
+            if (settingsFile == null) {
+                logger.warn("⚠️ Пропускаем коммит $shortHash — нет Gradle-сборки в worktree")
+                return@forEach
+            }
+
+            exec {
+                workingDir = worktreeDir
+                commandLine("./gradlew", "clean", "build", "--no-daemon")
+            }
+
+            val builtJar = File(worktreeDir, "build/libs").listFiles()
+                ?.firstOrNull { it.extension == "jar" }
+                ?: throw GradleException("JAR не найден после сборки коммита $shortHash")
+
+            val renamedJar = File(jarsDir, "${project.name}-$shortHash.jar")
+            builtJar.copyTo(renamedJar, overwrite = true)
+            logger.lifecycle("✅ Сохранён JAR: ${renamedJar.name}")
+
+            logger.lifecycle("🧹 Удаляем временный worktree $shortHash")
+            exec {
+                commandLine("git", "worktree", "remove", "--force", worktreeDir.absolutePath)
             }
         }
 
-        // Создание ZIP-архива
-        from(jarFiles)
-        archiveFileName.set(zipFileName)
-        destinationDirectory.set(file("${layout.buildDirectory}"))
-        logger.lifecycle("Created ZIP archive at ${layout.buildDirectory}/$zipFileName containing ${jarFiles.size} JARs")
+        val zipFile = File(buildDir, "teamArtifacts.zip")
+        ant.withGroovyBuilder {
+            "zip"("destfile" to zipFile) {
+                "fileset"("dir" to jarsDir)
+            }
+        }
+
+        logger.lifecycle("🎉 Архив с JAR-файлами создан: ${zipFile.absolutePath}")
     }
+}
+val buildWarWithEnv by tasks.registering(War::class) {
+    group = "build"
+    description = "Build WAR with env-specific Java version"
 
-    // Очистка после выполнения
+    val suffix = (findProperty("envSuffix") as? String) ?: "default"
+    archiveFileName.set("web-lab3-$suffix.war")
+
+}
+
+tasks.register("runEnvBuild") {
+    group = "build"
+    description = "Runs the buildWithEnvWar.sh script with given env file"
+
     doLast {
-        tempDir.deleteRecursively()
+
+        exec {
+            commandLine("bash", "./buildWithEnvWar.sh", envFile)
+        }
     }
 }
