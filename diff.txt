@@ -1,0 +1,87 @@
+diff --git a/.gradle/8.13/checksums/checksums.lock b/.gradle/8.13/checksums/checksums.lock
+new file mode 100644
+index 0000000..db0135f
+Binary files /dev/null and b/.gradle/8.13/checksums/checksums.lock differ
+diff --git a/.gradle/8.13/executionHistory/executionHistory.bin b/.gradle/8.13/executionHistory/executionHistory.bin
+new file mode 100644
+index 0000000..7ce16b5
+Binary files /dev/null and b/.gradle/8.13/executionHistory/executionHistory.bin differ
+diff --git a/.gradle/8.13/executionHistory/executionHistory.lock b/.gradle/8.13/executionHistory/executionHistory.lock
+new file mode 100644
+index 0000000..28f9e20
+Binary files /dev/null and b/.gradle/8.13/executionHistory/executionHistory.lock differ
+diff --git a/.gradle/8.13/fileChanges/last-build.bin b/.gradle/8.13/fileChanges/last-build.bin
+new file mode 100644
+index 0000000..f76dd23
+Binary files /dev/null and b/.gradle/8.13/fileChanges/last-build.bin differ
+diff --git a/.gradle/8.13/fileHashes/fileHashes.bin b/.gradle/8.13/fileHashes/fileHashes.bin
+new file mode 100644
+index 0000000..03b722b
+Binary files /dev/null and b/.gradle/8.13/fileHashes/fileHashes.bin differ
+diff --git a/.gradle/8.13/fileHashes/fileHashes.lock b/.gradle/8.13/fileHashes/fileHashes.lock
+new file mode 100644
+index 0000000..288bfb5
+Binary files /dev/null and b/.gradle/8.13/fileHashes/fileHashes.lock differ
+diff --git a/.gradle/8.13/fileHashes/resourceHashesCache.bin b/.gradle/8.13/fileHashes/resourceHashesCache.bin
+new file mode 100644
+index 0000000..13bff35
+Binary files /dev/null and b/.gradle/8.13/fileHashes/resourceHashesCache.bin differ
+diff --git a/.gradle/8.13/gc.properties b/.gradle/8.13/gc.properties
+new file mode 100644
+index 0000000..e69de29
+diff --git a/.gradle/buildOutputCleanup/buildOutputCleanup.lock b/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+new file mode 100644
+index 0000000..eaa6768
+Binary files /dev/null and b/.gradle/buildOutputCleanup/buildOutputCleanup.lock differ
+diff --git a/.gradle/buildOutputCleanup/cache.properties b/.gradle/buildOutputCleanup/cache.properties
+new file mode 100644
+index 0000000..573957f
+--- /dev/null
++++ b/.gradle/buildOutputCleanup/cache.properties
+@@ -0,0 +1,2 @@
++#Mon Apr 14 13:28:54 MSK 2025
++gradle.version=8.13
+diff --git a/.gradle/buildOutputCleanup/outputFiles.bin b/.gradle/buildOutputCleanup/outputFiles.bin
+new file mode 100644
+index 0000000..5b8b6a9
+Binary files /dev/null and b/.gradle/buildOutputCleanup/outputFiles.bin differ
+diff --git a/.gradle/file-system.probe b/.gradle/file-system.probe
+new file mode 100644
+index 0000000..04c4a12
+Binary files /dev/null and b/.gradle/file-system.probe differ
+diff --git a/.gradle/vcs-1/gc.properties b/.gradle/vcs-1/gc.properties
+new file mode 100644
+index 0000000..e69de29
+diff --git a/rollback-compile.sh b/rollback-compile.sh
+old mode 100644
+new mode 100755
+diff --git a/src/main/java/backend/academy/weblab3/Validator3.java b/src/main/java/backend/academy/weblab3/Validator3.java
+deleted file mode 100644
+index b420969..0000000
+--- a/src/main/java/backend/academy/weblab3/Validator3.java
++++ /dev/null
+@@ -1,24 +0,0 @@
+-package backend.academy.weblab3;
+-
+-public class Validator3 {
+-    public String validate(String xStr, double y, double r){
+-        StringBuilder sb = new StringBuilder();
+-        Double x = null;
+-        try{
+-            x = Double.parseDouble(xStr);
+-        }catch(NumberFormatException e){
+-            sb.append("X должен быть числом от -3 до 5\n");
+-        }
+-        if (x!=null && (x<-3 || x>5)) {
+-            sb.append("X должен быть числом от -3 до 5\n");
+-        }
+-        if (y>1 || y<-2 || y%0.5 != 0){
+-            sb.append("Невалидное значение y\n");
+-        }
+-        if (r<1 || r>4 || r%0.25 != 0){
+-            sb.append("Невалидное значение R\n");
+-        }
+-        return sb.toString();
+-
+-    }
+-}
