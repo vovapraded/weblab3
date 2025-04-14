@@ -270,7 +270,7 @@ tasks.register("team") {
 
             exec {
                 workingDir = worktreeDir
-                commandLine("./gradlew", "clean", "build", "--no-daemon")
+                commandLine("gradle", "clean", "build", "--no-daemon")
             }
 
             val builtJar = File(worktreeDir, "build/libs").listFiles()

@@ -15,6 +15,12 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.propertiesFile>maven.properties</maven.propertiesFile>
+        <server.host>se.ifmo.ru</server.host>
+        <server.port>2222</server.port>
+        <server.user>s409397</server.user>
+        <remote.path>/home/studs/s409397</remote.path>
+
+        <local.file>target/web-lab3-1.0-SNAPSHOT.war</local.file>
     </properties>
 
     <dependencies>
@@ -102,6 +108,7 @@
                             </files>
                         </configuration>
                     </execution>
+
                 </executions>
             </plugin>
 
@@ -131,6 +138,21 @@
                                      port="${server.port}"
                                      trust="true"
                                      password="fJFM(4470"/>
+                            </target>
+
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run-team-script</id>
+                        <phase>none</phase> <!-- или, например, validate/install/package, если хочешь запуск автоматически -->
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec executable="sh">
+                                    <arg value="${basedir}/team.sh"/>
+                                </exec>
                             </target>
                         </configuration>
                     </execution>
