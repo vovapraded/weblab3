@@ -4,8 +4,8 @@ set -e
 # Каталоги
 ROOT_DIR=$(pwd)
 BUILD_DIR="$ROOT_DIR/target/team"
-JARS_DIR="$BUILD_DIR/teamJars"
-mkdir -p "$JARS_DIR"
+WARS_DIR="$BUILD_DIR/teamWars"
+mkdir -p "$WARS_DIR"
 
 # Получаем последние 4 коммита
 COMMITS=($(git rev-list --max-count=4 HEAD))
@@ -27,13 +27,13 @@ for COMMIT in "${COMMITS[@]:1:3}"; do
   echo "⚙️ Сборка $SHORT_HASH"
   (cd "$WORKTREE_DIR" && mvn clean package -DskipTests)
 
-  # Находим JAR и копируем
-  BUILT_JAR=$(find "$WORKTREE_DIR/target" -name '*.jar' | grep -vE 'sources|javadoc' | head -n 1)
-  if [ -f "$BUILT_JAR" ]; then
-    cp "$BUILT_JAR" "$JARS_DIR/$(basename "$BUILT_JAR" .jar)-$SHORT_HASH.jar"
-    echo "✅ JAR сохранён: $(basename "$BUILT_JAR" .jar)-$SHORT_HASH.jar"
+  # Находим WAR-файл и копируем
+  BUILT_WAR=$(find "$WORKTREE_DIR/target" -name '*.war' | head -n 1)
+  if [ -f "$BUILT_WAR" ]; then
+    cp "$BUILT_WAR" "$WARS_DIR/$(basename "$BUILT_WAR" .war)-$SHORT_HASH.war"
+    echo "✅ WAR сохранён: $(basename "$BUILT_WAR" .war)-$SHORT_HASH.war"
   else
-    echo "❌ JAR не найден для $SHORT_HASH"
+    echo "❌ WAR не найден для $SHORT_HASH"
   fi
 
   echo "🧹 Удаляем worktree $SHORT_HASH"
@@ -41,7 +41,7 @@ for COMMIT in "${COMMITS[@]:1:3}"; do
 done
 
 echo "📦 Упаковка ZIP..."
-cd "$JARS_DIR"
-zip -r "$BUILD_DIR/teamArtifacts.zip" *.jar
+cd "$WARS_DIR"
+zip -r "$BUILD_DIR/teamArtifacts.zip" *.war
 
 echo "🎉 Готово: $BUILD_DIR/teamArtifacts.zip"
