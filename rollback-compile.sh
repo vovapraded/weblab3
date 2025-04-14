@@ -82,6 +82,7 @@ fi
 
 # Step 5: Restore back to main
 echo "↩️ Restoring working directory to main"
+git clean -xdf
 git checkout main --quiet
 clean_workspace
 echo "🎉 Done."
