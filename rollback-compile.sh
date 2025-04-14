@@ -28,8 +28,8 @@ function backup_changes() {
 function generate_diff() {
   local good=$1
   local bad=$2
-  echo "📝 Generating diff between $good and $bad"
-  git diff "$good" "$bad" > "$DIFF_FILE"
+  echo "📝 Generating diff between $good and $bad (only src/)"
+  git diff "$good" "$bad" -- src/ > "$DIFF_FILE"
   echo "✅ Diff saved to $DIFF_FILE"
 }
 
@@ -55,7 +55,7 @@ for ((i=1; i<${#COMMITS[@]}; i++)); do
   commit=${COMMITS[$i]}
   short=$(echo "$commit" | cut -c1-7)
   echo "🔄 Trying commit: $short"
-  git checkout "$commit" --quiet
+  git checkout "$commit" --quiet -- src/
   clean_workspace
   if compile_project; then
     LAST_GOOD=$commit
